@@ -248,7 +248,7 @@
 									{
 										xhrObject.xhr.abort(); // Stop
 										xhrObject.xhrTimeout = true;
-
+										
 										ajaxautosaveChangeIcon( _editor, Icons[5].path,
 											Icons[5].title
 												+ _editor.lang.ajaxautosave.requestTimeout );
@@ -299,6 +299,8 @@
 							// <result status="ok" />
 							if ( ( status == 'ok' ) )
 							{
+								console.log(Icons);
+								
 								LastSave = _getTimeOnClinetSide();
 
 								ajaxautosaveChangeIcon( _editor, Icons[4].path,
@@ -507,15 +509,28 @@
 
 	function ajaxautosaveChangeIcon( editor, iconPath, description )
 	{
-		var ajaxautosaveButton = CKEDITOR.document
-			.getById( editor.commands.ajaxautosave.uiItems[0]._.id );
-
-		ajaxautosaveButton.getFirst().setStyle( 'background-image',
-			'url(' + editor.plugins.ajaxautosave.path + iconPath + ')' );
-
-		ajaxautosaveButton.setAttribute( 'title', description );
-		// changes the value of label
-		ajaxautosaveButton.getChild( 1 ).setHtml( description );
+		
+		console.log('ajaxautosaveChangeIcon:', description);
+		
+		//if button is present
+		if (editor.commands.ajaxautosave.uiItems.lenght) {
+			
+			var ajaxautosaveButton = CKEDITOR.document
+				.getById( editor.commands.ajaxautosave.uiItems[0]._.id );
+	
+			ajaxautosaveButton.getFirst().setStyle( 'background-image',
+				'url(' + editor.plugins.ajaxautosave.path + iconPath + ')' );
+	
+			ajaxautosaveButton.setAttribute( 'title', description );
+			// changes the value of label
+			ajaxautosaveButton.getChild( 1 ).setHtml( description );
+		}
+		
+		if ( typeof(description) != 'undefined') {
+		
+			$('#cke_ajaxautosave').html(description);
+		}
+		
 	}
 
 	function endsWith( str, suffix ) {
@@ -555,8 +570,11 @@
 	//ajaxautosaveCheckDirty(editor) - icon was already changed to dirty
 	function checkAndRestoreIcon( editor, iconPath, description )
 	{
-		if ( Counter === CounterPrevious && !Working && !editor.checkDirty() )
+		//if button is enabled
+		if ( Counter === CounterPrevious && !Working && !editor.checkDirty()) {
+			
 			ajaxautosaveChangeIcon( editor, iconPath, description );
+		}
 	}
 
 	function addEvent( element, eventType, fn )
@@ -685,9 +703,33 @@
 				}
 			});
 
+			editor.on("uiSpace", function (event) {
+				
+				if (editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE) {
+					
+					throw new Error( 'inline mode not supported yet' );
+
+					//if (event.data.space == "top") {
+					//	event.data.html += "<div class=\"cke_wordcount\" style=\"\"" +
+					//		" title=\"" +
+					//		editor.lang.wordcount.title +
+					//		"\"" +
+					//		"><span id=\"" +
+					//		counterId(event.editor) +
+					//		"\" class=\"cke_path_item\">&nbsp;</span></div>";
+					//}
+				} else {
+					if (event.data.space == "bottom") {
+						event.data.html += "<div class='cke_ajaxautosave' style='float:left; margin-left:10px;' id='cke_ajaxautosave'> </div>";
+					}
+				}
+		
+			}, editor, null, 100);
+		
 			// initialize events for CKEditor.
 			editor.on( 'instanceReady', function( evt )
 			{
+				
 				//Interval can't be smaller than min time between two following requests.
 				//An exception from this rule is when interval is switched off (set to 0).
 				if ( editor.config.ajaxautosave.RefreshTime &&
@@ -849,27 +891,27 @@
 			// Set icon-message pairs.
 			Icons = [
 			{
-				path : 'images/autosaveClean.gif',
+				path : '1images/autosaveClean.gif',
 				title : editor.lang.ajaxautosave.draftSaved
 			},
 			{
-				path : 'images/autosaveDirty.gif',
+				path : '1images/autosaveDirty.gif',
 				title : editor.lang.ajaxautosave.needsSaving
 			},
 			{
-				path : 'images/loadingBig.gif',
+				path : '1images/loadingBig.gif',
 				title : editor.lang.ajaxautosave.inProgress
 			},
 			{
-				path : 'images/loadingSmall.gif',
+				path : '1images/loadingSmall.gif',
 				title : editor.lang.ajaxautosave.inProgress
 			},
 			{
-				path : 'images/tick_animated.gif',
+				path : '1images/tick_animated.gif',
 				title : editor.lang.ajaxautosave.draftSaved
 			},
 			{
-				path : 'images/cross_animated.gif',
+				path : '1images/cross_animated.gif',
 				title : editor.lang.ajaxautosave.errorTemplate
 			} ];
 
