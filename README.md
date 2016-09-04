@@ -1,0 +1,2 @@
+# ajaxautosave
+CKEditor ajaxautosave plugin
